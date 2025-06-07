@@ -1,42 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <title>Redirigiendo a Laia...</title>
+    <meta charset="UTF-8">
+    <title>Redireccionando…</title>
     <script>
-      window.onload = () => {
-        // Extraer del fragmento #access_token=...&type=recovery
-        const hashParams = new URLSearchParams(window.location.hash.slice(1));
-        const accessToken = hashParams.get('access_token');
-        const type = hashParams.get('type');
+      // Extraer fragmento del token en la URL actual
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const type = urlParams.get('type');
 
-        if (accessToken && type) {
-          // Redirigir al deep link
-          const deepLink = `laia://reset-password?access_token=${accessToken}&type=${type}`;
-          window.location.href = deepLink;
-        } else {
-          document.getElementById("status").innerText = "❌ Token o tipo no encontrado en el hash.";
-        }
-      };
+      // Si es recuperación de contraseña, redirigir a la app con deep link
+      if (type === 'recovery' && token) {
+        // Aquí Supabase no te da access_token, sino token_hash. Así que debes usar `token` en verifyOtp
+        window.location.href = `laia://auth/reset-password?token_hash=${token}&type=recovery`;
+      } else {
+        // Fallback por si hay otro tipo
+        window.location.href = 'laia://';
+      }
     </script>
   </head>
-  <body style="font-family: sans-serif; text-align: center; margin-top: 50px;">
-    <h1>Redirigiendo a la app Laia...</h1>
-    <p id="status">⏳ Procesando...</p>
-    <p>Si no eres redirigido, <a href="#" id="manualLink">haz clic aquí</a>.</p>
-
-    <script>
-      setTimeout(() => {
-        const hashParams = new URLSearchParams(window.location.hash.slice(1));
-        const accessToken = hashParams.get('access_token');
-        const type = hashParams.get('type');
-
-        if (accessToken && type) {
-          const deepLink = `laia://reset-password?access_token=${accessToken}&type=${type}`;
-          document.getElementById("manualLink").href = deepLink;
-          document.getElementById("manualLink").innerText = "haz clic aquí para abrir Laia";
-        }
-      }, 100);
-    </script>
+  <body>
+    <p>Redirigiendo a la app…</p>
   </body>
 </html>
