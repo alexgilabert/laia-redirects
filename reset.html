@@ -1,148 +1,42 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abriendo Laia...</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirigiendo a Laia...</title>
+    <script>
+      window.onload = () => {
+        // Extraer del fragmento #access_token=...&type=recovery
+        const hashParams = new URLSearchParams(window.location.hash.slice(1));
+        const accessToken = hashParams.get('access_token');
+        const type = hashParams.get('type');
+
+        if (accessToken && type) {
+          // Redirigir al deep link
+          const deepLink = `laia://reset-password?access_token=${accessToken}&type=${type}`;
+          window.location.href = deepLink;
+        } else {
+          document.getElementById("status").innerText = "❌ Token o tipo no encontrado en el hash.";
         }
-        
-        .container {
-            max-width: 400px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .logo {
-            font-size: 48px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-family: 'DM Serif Text', serif;
-        }
-        
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .fallback {
-            display: none;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            background: white;
-            color: #667eea;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-        
-        .debug {
-            margin-top: 30px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            font-size: 12px;
-            text-align: left;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="logo">Laia</div>
-        <h2>Abriendo la aplicación...</h2>
-        <div class="spinner"></div>
-        <p>Redirigiendo automáticamente</p>
-        
-        <div id="fallback" class="fallback">
-            <p><strong>¿No se abrió automáticamente?</strong></p>
-            <button class="btn" onclick="openApp()">Abrir Laia</button>
-            <p><small>Asegúrate de tener la app instalada</small></p>
-        </div>
-        
-        <!-- Debug info (solo visible en desarrollo) -->
-        <div class="debug">
-            <strong>Debug Info:</strong><br>
-            <span id="debug-info"></span>
-        </div>
-    </div>
+      };
+    </script>
+  </head>
+  <body style="font-family: sans-serif; text-align: center; margin-top: 50px;">
+    <h1>Redirigiendo a la app Laia...</h1>
+    <p id="status">⏳ Procesando...</p>
+    <p>Si no eres redirigido, <a href="#" id="manualLink">haz clic aquí</a>.</p>
 
     <script>
-        // Obtener parámetros de la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const type = urlParams.get('type');
-        
-        // Debug info
-        document.getElementById('debug-info').innerHTML = `
-            Token: ${token ? token.substring(0, 10) + '...' : 'No encontrado'}<br>
-            Type: ${type || 'No encontrado'}<br>
-            URL actual: ${window.location.href}
-        `;
-        
-        // Construir deep link
-        function buildDeepLink() {
-            if (token && type) {
-                return `laia://reset-password?token=${token}&type=${type}`;
-            } else {
-                return 'laia://reset-password';
-            }
+      setTimeout(() => {
+        const hashParams = new URLSearchParams(window.location.hash.slice(1));
+        const accessToken = hashParams.get('access_token');
+        const type = hashParams.get('type');
+
+        if (accessToken && type) {
+          const deepLink = `laia://reset-password?access_token=${accessToken}&type=${type}`;
+          document.getElementById("manualLink").href = deepLink;
+          document.getElementById("manualLink").innerText = "haz clic aquí para abrir Laia";
         }
-        
-        // Función para abrir la app
-        function openApp() {
-            const deepLink = buildDeepLink();
-            console.log('Intentando abrir:', deepLink);
-            window.location.href = deepLink;
-        }
-        
-        // Auto-redirect inmediato
-        window.onload = function() {
-            if (token && type === 'recovery') {
-                console.log('Token válido encontrado, redirigiendo...');
-                openApp();
-                
-                // Mostrar fallback después de 3 segundos
-                setTimeout(() => {
-                    document.getElementById('fallback').style.display = 'block';
-                }, 3000);
-            } else {
-                console.log('Token no válido o tipo incorrecto');
-                document.getElementById('fallback').style.display = 'block';
-                document.querySelector('.spinner').style.display = 'none';
-                document.querySelector('h2').textContent = 'Enlace de recuperación inválido';
-            }
-        };
+      }, 100);
     </script>
-</body>
+  </body>
 </html>
